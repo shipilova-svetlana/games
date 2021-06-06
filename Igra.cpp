@@ -6,7 +6,7 @@ void DrawBall (int x, int y, int r, int vx, int vy, COLORREF color, COLORREF fil
 void DrawPhysicsBall (int* x, int* y, int r, int* vx, int* vy, int* ax, int* ay, int dt, int* nCollisions);
 void DrawControlBall (int* vx, int* vy);
 
-//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 int main()
     {
     txCreateWindow (800, 600);
@@ -19,7 +19,7 @@ int main()
 
     return 0;
     }
-//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 void MoveBall()
     {
     int x  =  110, y  = 100, r = 30,
@@ -61,88 +61,84 @@ void MoveBall()
          txSleep (20);
 
          }
-      }
-
+    }
 //--------------------------------------------------------------------------------
 void DrawControlBall (int* vx, int* vy)
-         {
-         if (txGetAsyncKeyState (VK_RIGHT)) (*vx) ++;
-         if (txGetAsyncKeyState (VK_LEFT))  (*vx) --;
-         if (txGetAsyncKeyState (VK_UP))    (*vy) ++;
-         if (txGetAsyncKeyState (VK_DOWN))  (*vy) --;
+    {
+     if (txGetAsyncKeyState (VK_RIGHT)) (*vx) ++;
+     if (txGetAsyncKeyState (VK_LEFT))  (*vx) --;
+     if (txGetAsyncKeyState (VK_UP))    (*vy) ++;
+     if (txGetAsyncKeyState (VK_DOWN))  (*vy) --;
 
-         if (txGetAsyncKeyState (VK_SPACE)) *vx = *vy = 0;
-         }
+     if (txGetAsyncKeyState (VK_SPACE)) *vx = *vy = 0;
+     }
 //--------------------------------------------------------------------------------
 void DrawPhysicsBall (int* x, int* y, int r, int* vx, int* vy, int* ax, int* ay, int dt, int* nCollisions)
-         {
-         *vx = *vx + *ax * dt;
-         *vy = *vy + *ay * dt;
+    {
+     *vx = *vx + *ax * dt;
+     *vy = *vy + *ay * dt;
 
-         *x = *x + *vx * dt;
-         *y = *y + *vy * dt;
+     *x  = *x  + *vx * dt;
+     *y  = *y  + *vy * dt;
 
-         if (*x > 800 - r)
-             {
-             *vx = - (*vx);
-             *x = 800 - r;
+       if  (*x > 800 - r)
+           {
+            *vx = - (*vx);
+            *x = 800 - r;
 
-             (*nCollisions) ++;
-             }
-         if (*y > 600 - r)
-             {
-             *vy = - *vy;
-             *y  = 600 - r;
+           (*nCollisions) ++;
+           }
+       if  (*y > 600 - r)
+           {
+            *vy = - *vy;
+            *y  = 600 - r;
 
-             (*nCollisions) ++;
-             }
+           (*nCollisions) ++;
+           }
+       if  (*x < 0 + r)
+           {
+            *vx = - *vx;
+            *x  = 0 + r;
 
-         if (*x < 0 + r)
-             {
-             *vx = - *vx;
-             *x  = 0 + r;
+           (*nCollisions) ++;
+           }
+       if  (*y < 0 + r)
+           {
+            *vy = - *vy;
+            *y = 0 + r;
 
-             (*nCollisions) ++;
-             }
-
-          if (*y < 0 + r)
-             {
-             *vy = - *vy;
-             *y = 0 + r;
-
-             (*nCollisions) ++;
-             }
-        }
+           (*nCollisions) ++;
+           }
+    }
 //--------------------------------------------------------------------------------
 void DrawBall (int x, int y, int r, int vx, int vy, COLORREF color, COLORREF fillcolor)
-         {
-         txSetColor (color,3);
-         txSetFillColor (fillcolor);
+    {
+     txSetColor (color,3);
+     txSetFillColor (fillcolor);
 
-         txCircle (x, y, r);
-         txLine   (x, y, x + vx*5, y + vy*5);
-         txCircle (x + vx*5, y + vy*5, 3);
-         }
+     txCircle (x, y, r);
+     txLine   (x, y, x + vx*5, y + vy*5);
+     txCircle (x + vx*5, y + vy*5, 3);
+    }
 //--------------------------------------------------------------------------------
 void DrawX (int x)
+    {
+     char strX[20] = "";
+     sprintf (strX, "x = %d", x);
 
-         {
-         char strX[20] = "";
-         sprintf (strX, "x = %d", x);
+     int centerX = 750,
+         centerY = 50;
 
-         int centerX = 750,
-             centerY = 50;
+     int textSizeX = txGetTextExtentX ("x = 0000"),
+         textSizeY = txGetTextExtentY ("x = 0000");
 
-         int textSizeX = txGetTextExtentX ("x = 0000"),
-             textSizeY = txGetTextExtentY ("x = 0000");
+     txSetColor (TX_WHITE,3);
+     txSetFillColor (TX_BLACK);
+     txRectangle (centerX - textSizeX/2 - 50, centerY - textSizeY/2 - 50,
+                  centerX - textSizeX/2 + 50, centerY - textSizeY/2 + 50);
 
-         txSetColor (TX_WHITE,3);
-         txSetFillColor (TX_BLACK);
-         txRectangle (centerX - textSizeX/2 - 50, centerY - textSizeY/2 - 50,
-                      centerX - textSizeX/2 + 50, centerY - textSizeY/2 + 50);
-
-         txDrawText  (centerX - textSizeX/2 - 50, centerY - textSizeY/2 - 50,
-                      centerX - textSizeX/2 + 50, centerY - textSizeY/2 + 50,
-                      strX);
-         }
+     txDrawText  (centerX - textSizeX/2 - 50, centerY - textSizeY/2 - 50,
+                  centerX - textSizeX/2 + 50, centerY - textSizeY/2 + 50,
+                  strX);
+    }
 
