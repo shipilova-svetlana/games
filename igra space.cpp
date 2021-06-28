@@ -1,33 +1,33 @@
 #include "TXLib.h"
 struct Ball
     {
-    int x,  y,
+    double x,  y,
         vx, vy;
 
-    int r;
+    double r;
 
     COLORREF color, fillcolor;
 
     void Draw();
 
-    void Physics (int ax, int ay, int dt);
+    void Physics (double ax, double ay, double dt);
 
 //    void Change ();
     };
 
 void MoveBall();
 void DrawX (int x);
-void DrawBall (int x, int y, int r, int vx, int vy, COLORREF color, COLORREF fillcolor);
-void DrawPhysicsBall (int* x, int* y, int* vx, int* vy, int* ax, int* ay, int dt,  int r);
-void DrawControlBall (int* vx, int* vy, int* vx3, int* vy3);
+void DrawBall (double x, double y, double r, double vx, double vy, COLORREF color, COLORREF fillcolor);
+void DrawPhysicsBall (double* x, double* y, double* vx, double* vy, double* ax, double* ay, double dt,  double r);
+void DrawControlBall (double* vx, double* vy, double* vx3, double* vy3);
 void DrawScot (int score);
-void Collision (int x1, int y1, int x2, int y2, int* vx1, int* vy1, int* vx2, int* vy2, int r1, int r2, int* score);
+void Collision (double x1, double y1, double x2, double y2, double* vx1, double* vy1, double* vx2, double* vy2, double r1, double r2, double* score);
 //--------------------------------------------------------------------------------
 int main()
     {
     txCreateWindow (800, 600);
 
-    txSetFillColor (RGB (155, 140, 155));
+//    txSetFillColor (RGB (155, 140, 155));
 
     txClear ();
 
@@ -39,27 +39,27 @@ int main()
 void MoveBall()
     {
     HDC fon = txLoadImage ("Images\\fon.bmp");
-    int x  =  110, y  = 100,
+    double x  =  110, y  = 100,
         vx =    7, vy =   5,
         ax =    0, ay =   0,
 
-        r = 30;
+        r = 15;
 
-    int x3  = 300, y3  = 200,
+    double x3  = 300, y3  = 200,
         vx3 =   5, vy3 =   3,
         ax3 =   0, ay3 =   0,
 
-        r3 = 50;
+        r3 = 13;
 
-    int dt = 1;
+    double dt = 1;
 
-    int score = 0;
+    double score = 0;
 
 //    int nCollisions = 0;
 
     while (!txGetAsyncKeyState (VK_ESCAPE))
          {
-         txSetFillColor (RGB (155, 140, 155));
+//         txSetFillColor (RGB (155, 140, 155));
          txClear ();
 
          txTransparentBlt (txDC(), 0, 0, 0, 0, fon, 0, 0);
@@ -84,23 +84,23 @@ void MoveBall()
     txDeleteDC (fon);
     }
 //--------------------------------------------------------------------------------
-void DrawControlBall (int* vx, int* vy, int* vx3, int* vy3)
+void DrawControlBall (double* vx, double* vy, double* vx3, double* vy3)
     {
      if (txGetAsyncKeyState (VK_RIGHT)) (*vx) ++;
      if (txGetAsyncKeyState (VK_LEFT))  (*vx) --;
      if (txGetAsyncKeyState (VK_UP))    (*vy) ++;
      if (txGetAsyncKeyState (VK_DOWN))  (*vy) --;
 
-     if (txGetAsyncKeyState ('F')) *vx3 = *vx3 + 1;
-     if (txGetAsyncKeyState ('A')) *vx3 = *vx3 - 1;
-     if (txGetAsyncKeyState ('W')) *vy3 = *vy3 - 1;
-     if (txGetAsyncKeyState ('S')) *vy3 = *vy3 + 1;
+     if (txGetAsyncKeyState ('F')) (*vx3) ++;
+     if (txGetAsyncKeyState ('A')) (*vx3) --;
+     if (txGetAsyncKeyState ('W')) (*vy3) --;
+     if (txGetAsyncKeyState ('S')) (*vy3) ++;
 
      if (txGetAsyncKeyState (VK_SPACE)) *vx = *vy = *vy3 = *vy3 = 0;
      }
 
 //--------------------------------------------------------------------------------
-void DrawPhysicsBall (int* x, int* y, int* vx, int* vy, int* ax, int* ay, int dt, int r)
+void DrawPhysicsBall (double* x, double* y, double* vx, double* vy, double* ax, double* ay, double dt, double r)
     {
      *vx += (*ax) * dt;
      *vy += (*ay) * dt;
@@ -134,7 +134,7 @@ void DrawPhysicsBall (int* x, int* y, int* vx, int* vy, int* ax, int* ay, int dt
            }
     }
 //--------------------------------------------------------------------------------
-void DrawBall (int x, int y, int r, int vx, int vy, COLORREF color, COLORREF fillcolor)
+void DrawBall (double x, double y, double r, double vx, double vy, COLORREF color, COLORREF fillcolor)
     {
 
      txSetColor (color,2);
@@ -184,8 +184,13 @@ void DrawScot (int score)
     txTextOut   (centerX - textSizeX/2, 0, str);
     }
 //-------------------------------------------------------------
-
-void Collision (int x1, int y1, int x2, int y2, int* vx1, int* vy1, int* vx2, int* vy2, int r1, int r2, int* score)
+double DistanceBalls (double xA, double yA, double xB, double yB)
+    {
+    double dist = sqrt ((xA - xB) * (xA - xB) + (yA - yB) * (yA - yB));
+    return dist;
+    }
+//-------------------------------------------------------------
+void Collision (double x1, double y1, double x2, double y2, double* vx1, double* vy1, double* vx2, double* vy2, double r1, double r2, double* score)
     {
     if (pow(x1 - x2, 2) + pow(y1 - y2, 2) <= r1*r1 + 2*r1*r2 + r2*r2)
         {
