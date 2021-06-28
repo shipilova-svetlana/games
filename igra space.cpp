@@ -1,10 +1,25 @@
 #include "TXLib.h"
+struct Ball
+    {
+    int x,  y,
+        vx, vy;
+
+    int r;
+
+    COLORREF color, fillcolor;
+
+    void Draw();
+
+    void Physics (int ax, int ay, int dt);
+
+//    void Change ();
+    };
 
 void MoveBall();
 void DrawX (int x);
 void DrawBall (int x, int y, int r, int vx, int vy, COLORREF color, COLORREF fillcolor);
-void DrawPhysicsBall (int* x, int* y, int r, int* vx, int* vy, int* ax, int* ay, int dt, int* nCollisions);
-void DrawControlBall (int* vx, int* vy);
+void DrawPhysicsBall (int* x, int* y, int* vx, int* vy, int* ax, int* ay, int dt,  int r);
+void DrawControlBall (int* vx, int* vy, int* vx3, int* vy3);
 void DrawScot (int score);
 void Collision (int x1, int y1, int x2, int y2, int* vx1, int* vy1, int* vx2, int* vy2, int r1, int r2, int* score);
 //--------------------------------------------------------------------------------
@@ -23,101 +38,111 @@ int main()
 //--------------------------------------------------------------------------------
 void MoveBall()
     {
-    int x  =  110, y  = 100, r = 30,
-        vx =   7, vy =   5,
-        ax =   0, ay =   1;
+    HDC fon = txLoadImage ("Images\\fon.bmp");
+    int x  =  110, y  = 100,
+        vx =    7, vy =   5,
+        ax =    0, ay =   0,
 
-    int x3  = 300, y3  = 200, r3 = 50,
-        vx3 =   7, vy3 =   2,
-        ax3 =   0, ay3 =   1;
+        r = 30;
+
+    int x3  = 300, y3  = 200,
+        vx3 =   5, vy3 =   3,
+        ax3 =   0, ay3 =   0,
+
+        r3 = 50;
 
     int dt = 1;
 
     int score = 0;
 
-    int nCollisions = 0;
+//    int nCollisions = 0;
 
     while (!txGetAsyncKeyState (VK_ESCAPE))
          {
          txSetFillColor (RGB (155, 140, 155));
          txClear ();
 
+         txTransparentBlt (txDC(), 0, 0, 0, 0, fon, 0, 0);
+
          DrawX (x);
 
          DrawScot (score);
 
-         DrawBall (x,  y,   r,  vx,  vy, TX_LIGHTRED, TX_YELLOW);
-         DrawBall (x3, y3, r3, vx3, vy3, TX_LIGHTGREEN, TX_GREEN);
+         DrawBall (x,  y,  vx,  vy,  r,  TX_LIGHTRED, TX_YELLOW);
+         DrawBall (x3, y3, vx3, vy3, r3, TX_LIGHTGREEN, TX_GREEN);
 
-         DrawPhysicsBall (&x,  &y,  r,  &vx,   &vy,  &ax,  &ay, dt, &nCollisions);
-         DrawPhysicsBall (&x3, &y3, r3, &vx3, &vy3, &ax3, &ay3, dt, &nCollisions);
+         DrawPhysicsBall (&x,  &y,  &vx,   &vy,  &ax,  &ay, dt, r);
+         DrawPhysicsBall (&x3, &y3, &vx3, &vy3, &ax3, &ay3, dt, r3);
 
-         DrawControlBall (&vx, &vy);
+         DrawControlBall (&vx, &vy, &x3, &y3);
 
          Collision   (x, y, x3, y3, &vx, &vy, &vx3, &vy3, r, r3, &score);
 
          txSleep (20);
 
          }
+    txDeleteDC (fon);
     }
 //--------------------------------------------------------------------------------
-void DrawControlBall (int* vx, int* vy)
+void DrawControlBall (int* vx, int* vy, int* vx3, int* vy3)
     {
      if (txGetAsyncKeyState (VK_RIGHT)) (*vx) ++;
      if (txGetAsyncKeyState (VK_LEFT))  (*vx) --;
      if (txGetAsyncKeyState (VK_UP))    (*vy) ++;
      if (txGetAsyncKeyState (VK_DOWN))  (*vy) --;
 
-     if (txGetAsyncKeyState (VK_SPACE)) *vx = *vy = 0;
-     }
-//--------------------------------------------------------------------------------
-void DrawPhysicsBall (int* x, int* y, int r, int* vx, int* vy, int* ax, int* ay, int dt, int* nCollisions)
-    {
-     *vx = *vx + *ax * dt;
-     *vy = *vy + *ay * dt;
+     if (txGetAsyncKeyState ('F')) *vx3 = *vx3 + 1;
+     if (txGetAsyncKeyState ('A')) *vx3 = *vx3 - 1;
+     if (txGetAsyncKeyState ('W')) *vy3 = *vy3 - 1;
+     if (txGetAsyncKeyState ('S')) *vy3 = *vy3 + 1;
 
-     *x  = *x  + *vx * dt;
-     *y  = *y  + *vy * dt;
+     if (txGetAsyncKeyState (VK_SPACE)) *vx = *vy = *vy3 = *vy3 = 0;
+     }
+
+//--------------------------------------------------------------------------------
+void DrawPhysicsBall (int* x, int* y, int* vx, int* vy, int* ax, int* ay, int dt, int r)
+    {
+     *vx += (*ax) * dt;
+     *vy += (*ay) * dt;
+
+     *x  += (*vx) * dt;
+     *y  += (*vy) * dt;
 
        if  (*x > 800 - r)
            {
             *vx = - (*vx);
             *x = 800 - r;
 
-           (*nCollisions) ++;
            }
        if  (*y > 600 - r)
            {
             *vy = - *vy;
             *y  = 600 - r;
 
-           (*nCollisions) ++;
            }
        if  (*x < 0 + r)
            {
             *vx = - *vx;
             *x  = 0 + r;
 
-           (*nCollisions) ++;
            }
        if  (*y < 0 + r)
            {
             *vy = - *vy;
             *y = 0 + r;
 
-           (*nCollisions) ++;
            }
     }
 //--------------------------------------------------------------------------------
 void DrawBall (int x, int y, int r, int vx, int vy, COLORREF color, COLORREF fillcolor)
     {
 
-     txSetColor (color,3);
+     txSetColor (color,2);
      txSetFillColor (fillcolor);
 
      txCircle (x, y, r);
-     txLine   (x, y, x + vx*5, y + vy*5);
-     txCircle (x + vx*5, y + vy*5, 3);
+//     txLine   (x, y, x + vx*2, y + vy*2);
+//     txCircle (x + vx*2, y + vy*2, 20);
     }
 //--------------------------------------------------------------------------------
 void DrawX (int x)
@@ -145,7 +170,7 @@ void DrawX (int x)
 void DrawScot (int score)
     {
     txSelectFont ("TimesNewRoman", 30);
-    char str[10] = "";
+    char str[15] = "";
     sprintf (str, "Score = %d", score);
 
     int centerX = txGetExtentX()/2;
